@@ -203,7 +203,7 @@
   }
 
   .key.wide {
-    font-size: 0.9rem;
+    font-size: 1rem;
     flex: 1.6 1 0;
     padding: 0 6px;
   }
@@ -217,13 +217,14 @@
     font-size: 0.8rem;
   }
 }
-    html, body {
+html, body,
+.key,
+.variant-option,
+button {
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
-    .key,
-.variant-option {
-  touch-action: manipulation;
-}
+
   </style>
 </head>
 <body>
@@ -702,12 +703,24 @@ document.addEventListener('click', (e) => {
     // ─── Start ────────────────────────────────────────────────────────────────
     let lastTouchEnd = 0;
 
-document.addEventListener('touchend', (e) => {
+document.addEventListener('touchend', function (e) {
   const now = Date.now();
-  if (now - lastTouchEnd <= 300) {
+  if (now - lastTouchEnd < 350) {
     e.preventDefault();
   }
   lastTouchEnd = now;
+}, { passive: false });
+
+// 👇 THIS is the missing piece
+document.addEventListener('touchstart', function (e) {
+  if (e.touches.length > 1) {
+    e.preventDefault(); // prevent pinch zoom
+  }
+}, { passive: false });
+
+// 👇 iOS gesture zoom (very important)
+document.addEventListener('gesturestart', function (e) {
+  e.preventDefault();
 }, { passive: false });
     loadWords();
   </script>
