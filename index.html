@@ -203,7 +203,7 @@
   }
 
   .key.wide {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     flex: 1.6 1 0;
     padding: 0 6px;
   }
@@ -700,6 +700,15 @@ document.addEventListener('click', (e) => {
     });
 
     // ─── Start ────────────────────────────────────────────────────────────────
+    let lastTouchEnd = 0;
+
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    e.preventDefault();
+  }
+  lastTouchEnd = now;
+}, { passive: false });
     loadWords();
   </script>
 </body>
