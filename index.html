@@ -494,7 +494,7 @@ function showVariantPopup(keyEl, baseLetter) {
     }
 
     // ─── Keyboard ─────────────────────────────────────────────────────────────
-    function renderKeyboard() {
+function renderKeyboard() {
   keyboardEl.innerHTML = '';
 
   KEYBOARD_ROWS.forEach(row => {
@@ -510,20 +510,19 @@ function showVariantPopup(keyEl, baseLetter) {
 
       const hasVariants = !!LETTER_VARIANTS[key];
 
-keyEl.addEventListener('click', (e) => {
-  e.preventDefault();
-  e.stopPropagation();
+      keyEl.addEventListener('touchstart', (e) => {
+        if (gameState !== 'playing') return;
+        longPressTriggered = false;
 
-  if (longPressTriggered) {
-    setTimeout(() => {
-      longPressTriggered = false;
-    }, 0);
-    return;
-  }
+        if (!hasVariants) return;
 
-  closeVariantPopup();
-  handleKeyPress(key);
-});
+        e.preventDefault();
+
+        longPressTimer = setTimeout(() => {
+          longPressTriggered = true;
+          showVariantPopup(keyEl, key);
+        }, 400);
+      }, { passive: false });
 
       keyEl.addEventListener('touchend', () => {
         clearTimeout(longPressTimer);
@@ -533,7 +532,7 @@ keyEl.addEventListener('click', (e) => {
         clearTimeout(longPressTimer);
       });
 
-      keyEl.addEventListener('mousedown', (e) => {
+      keyEl.addEventListener('mousedown', () => {
         if (gameState !== 'playing') return;
         longPressTriggered = false;
 
@@ -554,10 +553,13 @@ keyEl.addEventListener('click', (e) => {
       });
 
       keyEl.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
 
         if (longPressTriggered) {
-          longPressTriggered = false;
+          setTimeout(() => {
+            longPressTriggered = false;
+          }, 0);
           return;
         }
 
@@ -573,13 +575,16 @@ keyEl.addEventListener('click', (e) => {
   });
 }
 
-    function updateKeyboard() {
-      document.querySelectorAll('.key').forEach(keyEl => {
-        const key = keyEl.dataset.key;
-        if (keyboardStatus[key]) keyEl.className = 'key' + (key.length > 1 ? ' wide' : '') + ' ' + keyboardStatus[key];
-        if (gameState !== 'playing') keyEl.disabled = true;
-      });
+function updateKeyboard() {
+  document.querySelectorAll('.key').forEach(keyEl => {
+    const key = keyEl.dataset.key;
+    if (keyboardStatus[key]) {
+      keyEl.className = 'key' + (key.length > 1 ? ' wide' : '') + ' ' + keyboardStatus[key];
     }
+    if (gameState !== 'playing') keyEl.disabled = true;
+  });
+}
+
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.key')) {
     closeVariantPopup();
