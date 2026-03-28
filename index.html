@@ -92,13 +92,14 @@
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  z-index: 200;
+  z-index: 9999;              /* 🔥 increase priority */
   direction: rtl;
+  pointer-events: auto;       /* 🔥 allow interaction */
 }
 
 .variant-option {
-  min-width: 42px;
-  height: 42px;
+  min-width: 48px;
+  height: 48px;
   border: none;
   border-radius: 8px;
   background: rgba(255,255,255,0.08);
@@ -106,8 +107,12 @@
   font-family: 'Noto Kufi Arabic', serif;
   font-size: 1.2rem;
   cursor: pointer;
-}
 
+  pointer-events: auto;       /* 🔥 ensure clickable */
+  touch-action: manipulation; /* 🔥 mobile fix */
+  -webkit-user-select: none;
+  user-select: none;
+}
 .variant-option:hover,
 .variant-option.active {
   background: rgba(255,255,255,0.18);
@@ -334,20 +339,18 @@ function showVariantPopup(keyEl, baseLetter) {
     btn.textContent = letter;
     btn.type = 'button';
 
-    function chooseVariant(e) {
+    const chooseVariant = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      insertLetter(letter);
+      currentGuess += letter;
+      updateCurrentRow();
       closeVariantPopup();
       longPressTriggered = true;
-    }
+    };
 
-    btn.addEventListener('touchstart', chooseVariant, { passive: false });
-    btn.addEventListener('mousedown', chooseVariant);
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
+    btn.addEventListener('touchend', chooseVariant, { passive: false });
+    btn.addEventListener('click', chooseVariant);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
 
     popup.appendChild(btn);
   });
@@ -507,19 +510,20 @@ function showVariantPopup(keyEl, baseLetter) {
 
       const hasVariants = !!LETTER_VARIANTS[key];
 
-      keyEl.addEventListener('touchstart', (e) => {
-        if (gameState !== 'playing') return;
-        longPressTriggered = false;
+keyEl.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
 
-        if (!hasVariants) return;
+  if (longPressTriggered) {
+    setTimeout(() => {
+      longPressTriggered = false;
+    }, 0);
+    return;
+  }
 
-        e.preventDefault();
-        clearTimeout(longPressTimer);
-        longPressTimer = setTimeout(() => {
-          longPressTriggered = true;
-          showVariantPopup(keyEl, key);
-        }, 400);
-      }, { passive: false });
+  closeVariantPopup();
+  handleKeyPress(key);
+});
 
       keyEl.addEventListener('touchend', () => {
         clearTimeout(longPressTimer);
