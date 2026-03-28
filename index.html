@@ -552,16 +552,16 @@ function renderKeyboard() {
         clearTimeout(longPressTimer);
       });
 
-      keyEl.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+keyEl.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
 
-        if (longPressTriggered) {
-          setTimeout(() => {
-            longPressTriggered = false;
-          }, 0);
-          return;
-        }
+  if (longPressTriggered) {
+    setTimeout(() => {
+      longPressTriggered = false;
+    }, 300);   // ← was 0, now 300ms
+    return;
+  }
 
         closeVariantPopup();
         handleKeyPress(key);
@@ -585,11 +585,12 @@ function updateKeyboard() {
   });
 }
 
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.key')) {
+    document.addEventListener('click', (e) => {
+  if (!e.target.closest('.key') && !e.target.closest('.variant-popup')) {
     closeVariantPopup();
   }
 });
+
 // -- letter normalizing function.
 //     function normalizeArabic(text) {
 //   return text
@@ -713,6 +714,7 @@ document.addEventListener('click', (e) => {
     let lastTouchEnd = 0;
 
 document.addEventListener('touchend', function (e) {
+  if (e.target.closest('.variant-popup')) return; // ← let variant taps through
   const now = Date.now();
   if (now - lastTouchEnd < 350) {
     e.preventDefault();
