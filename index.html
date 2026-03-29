@@ -273,6 +273,7 @@
     let activeVariantButton = null;
     let activeTouchVariantKey = null;
     let suppressNextKeyClick = false;
+    let dragSelectingVariant = false;
 
     const gameArea = document.getElementById('game-area');
     const messageEl = document.getElementById('message');
@@ -303,55 +304,73 @@
       }
     }
 
-    function showVariantPopup(keyEl, baseLetter) {
-      closeVariantPopup();
+    function closeVariantPopup() {
+  if (activePopup) {
+    activePopup.remove();
+    activePopup = null;
+  }
+  activeVariantButton = null;
+  activeVariantKeyEl = null;
+  dragSelectingVariant = false;
+}
 
-      const variants = LETTER_VARIANTS[baseLetter];
-      if (!variants || variants.length === 0) return;
+function setActiveVariantButton(btn) {
+  if (activeVariantButton) {
+    activeVariantButton.classList.remove('active');
+  }
+  activeVariantButton = btn || null;
+  if (activeVariantButton) {
+    activeVariantButton.classList.add('active');
+  }
+}
 
-      const popup = document.createElement('div');
-      popup.className = 'variant-popup';
+function updateActiveVariantFromPoint(x, y) {
+  if (!activePopup) return;
 
-      variants.forEach(letter => {
-        const btn = document.createElement('button');
-        btn.className = 'variant-option';
-        btn.textContent = letter;
-        btn.type = 'button';
-        btn.dataset.letter = letter;
-        popup.appendChild(btn);
-      });
+  const el = document.elementFromPoint(x, y);
+  const btn = el ? el.closest('.variant-option') : null;
 
-      keyEl.appendChild(popup);
-      activePopup = popup;
-    }
+  if (btn && activePopup.contains(btn)) {
+    setActiveVariantButton(btn);
+  } else {
+    setActiveVariantButton(null);
+  }
+}
 
-    function setActiveVariantButton(btn) {
-      if (activeVariantButton) {
-        activeVariantButton.classList.remove('active');
-      }
-      activeVariantButton = btn || null;
-      if (activeVariantButton) {
-        activeVariantButton.classList.add('active');
-      }
-    }
+function commitActiveVariant() {
+  if (activeVariantButton) {
+    insertLetter(activeVariantButton.dataset.letter);
+  }
+  closeVariantPopup();
+}
 
-    function updateActiveVariantFromPoint(x, y) {
-      if (!activePopup) return;
-      const el = document.elementFromPoint(x, y);
-      const btn = el ? el.closest('.variant-option') : null;
-      if (btn && activePopup.contains(btn)) {
-        setActiveVariantButton(btn);
-      } else {
-        setActiveVariantButton(null);
-      }
-    }
+function showVariantPopup(keyEl, baseLetter, startX, startY) {
+  closeVariantPopup();
 
-    function commitActiveVariant() {
-      if (activeVariantButton) {
-        insertLetter(activeVariantButton.dataset.letter);
-      }
-      closeVariantPopup();
-    }
+  const variants = LETTER_VARIANTS[baseLetter];
+  if (!variants || variants.length === 0) return;
+
+  const popup = document.createElement('div');
+  popup.className = 'variant-popup';
+
+  variants.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'variant-option';
+    btn.textContent = letter;
+    btn.type = 'button';
+    btn.dataset.letter = letter;
+    popup.appendChild(btn);
+  });
+
+  keyEl.appendChild(popup);
+  activePopup = popup;
+  activeVariantKeyEl = keyEl;
+  dragSelectingVariant = true;
+
+  requestAnimationFrame(() => {
+    updateActiveVariantFromPoint(startX, startY);
+  });
+}
 
     async function loadWords() {
       try {
@@ -486,39 +505,90 @@
       updateKeyboard();
     }
 
-    function renderKeyboard() {
-      keyboardEl.innerHTML = '';
+  function renderKeyboard() {
+  keyboardEl.innerHTML = '';
 
-      KEYBOARD_ROWS.forEach(row => {
-        const rowEl = document.createElement('div');
-        rowEl.className = 'keyboard-row';
+  KEYBOARD_ROWS.forEach(row => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'keyboard-row';
 
-        row.forEach(key => {
-          const keyEl = document.createElement('button');
-          keyEl.className = 'key' + (key.length > 1 ? ' wide' : '');
-          if (keyboardStatus[key]) keyEl.className += ' ' + keyboardStatus[key];
-          keyEl.textContent = key;
-          keyEl.dataset.key = key;
-          keyEl.type = 'button';
+    row.forEach(key => {
+      const keyEl = document.createElement('button');
+      keyEl.className = 'key' + (key.length > 1 ? ' wide' : '');
+      if (keyboardStatus[key]) keyEl.className += ' ' + keyboardStatus[key];
+      keyEl.textContent = key;
+      keyEl.dataset.key = key;
+      keyEl.type = 'button';
 
-          const hasVariants = !!LETTER_VARIANTS[key];
+      const hasVariants = !!LETTER_VARIANTS[key];
 
-          keyEl.addEventListener('touchstart', (e) => {
-            if (gameState !== 'playing') return;
-            suppressNextKeyClick = false;
-            clearTimeout(longPressTimer);
+      keyEl.addEventListener('touchstart', (e) => {
+        if (gameState !== 'playing') return;
 
-            if (!hasVariants) return;
+        suppressNextKeyClick = false;
+        clearTimeout(longPressTimer);
 
-            e.preventDefault();
-            activeTouchVariantKey = key;
+        if (!hasVariants) return;
 
-            const touch = e.touches[0];
-            longPressTimer = setTimeout(() => {
-              showVariantPopup(keyEl, key);
-              updateActiveVariantFromPoint(touch.clientX, touch.clientY);
-            }, 350);
-          }, { passive: false });
+        const touch = e.touches[0];
+        if (!touch) return;
+
+        e.preventDefault();
+
+        longPressTimer = setTimeout(() => {
+          showVariantPopup(keyEl, key, touch.clientX, touch.clientY);
+          suppressNextKeyClick = true;
+        }, 350);
+      }, { passive: false });
+
+      keyEl.addEventListener('touchend', () => {
+        clearTimeout(longPressTimer);
+      });
+
+      keyEl.addEventListener('touchcancel', () => {
+        clearTimeout(longPressTimer);
+      });
+
+      keyEl.addEventListener('mousedown', (e) => {
+        if (gameState !== 'playing') return;
+        clearTimeout(longPressTimer);
+
+        if (!hasVariants) return;
+
+        longPressTimer = setTimeout(() => {
+          showVariantPopup(keyEl, key, e.clientX, e.clientY);
+          suppressNextKeyClick = true;
+        }, 350);
+      });
+
+      keyEl.addEventListener('mouseup', () => {
+        clearTimeout(longPressTimer);
+      });
+
+      keyEl.addEventListener('mouseleave', () => {
+        clearTimeout(longPressTimer);
+      });
+
+      keyEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (suppressNextKeyClick) {
+          suppressNextKeyClick = false;
+          return;
+        }
+
+        closeVariantPopup();
+        handleKeyPress(key);
+      });
+
+      if (gameState !== 'playing') keyEl.disabled = true;
+      rowEl.appendChild(keyEl);
+    });
+
+    keyboardEl.appendChild(rowEl);
+  });
+}
 
           keyEl.addEventListener('touchmove', (e) => {
             if (!hasVariants) return;
@@ -774,7 +844,49 @@
     document.addEventListener('gesturestart', function (e) {
       e.preventDefault();
     }, { passive: false });
+document.addEventListener('touchmove', (e) => {
+  if (!dragSelectingVariant || !activePopup) return;
 
+  const touch = e.touches[0];
+  if (!touch) return;
+
+  e.preventDefault();
+  updateActiveVariantFromPoint(touch.clientX, touch.clientY);
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
+  if (dragSelectingVariant && activePopup) {
+    e.preventDefault();
+    commitActiveVariant();
+    suppressNextKeyClick = true;
+    return;
+  }
+
+  const now = Date.now();
+  if (!window._lastTouchEnd) window._lastTouchEnd = 0;
+  if (now - window._lastTouchEnd < 350) {
+    e.preventDefault();
+  }
+  window._lastTouchEnd = now;
+}, { passive: false });
+
+document.addEventListener('mousemove', (e) => {
+  if (!dragSelectingVariant || !activePopup) return;
+  updateActiveVariantFromPoint(e.clientX, e.clientY);
+});
+
+document.addEventListener('mouseup', () => {
+  if (dragSelectingVariant && activePopup) {
+    commitActiveVariant();
+    suppressNextKeyClick = true;
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.key') && !e.target.closest('.variant-popup')) {
+    closeVariantPopup();
+  }
+});
     loadWords();
   </script>
 </body>
