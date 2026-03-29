@@ -121,13 +121,14 @@
       font-size: 1.2rem;
       cursor: pointer;
       pointer-events: auto;
-      touch-action: manipulation;
+      touch-action: none;
       -webkit-user-select: none;
       user-select: none;
+      transition: transform 0.08s ease, background 0.08s ease;
     }
-    .variant-option:hover,
     .variant-option.active {
-      background: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.22);
+      transform: scale(1.08);
     }
 
     .game-over-overlay {
@@ -253,10 +254,10 @@
     ];
 
     const LETTER_VARIANTS = {
-      'ا': ['أ', 'إ', 'آ'],
-      'ي': ['ى', 'ئ'],
-      'و': ['ؤ'],
-      'ه': ['ة']
+      'ا': ['ا', 'أ', 'إ', 'آ'],
+      'ي': ['ي', 'ى', 'ئ'],
+      'و': ['و', 'ؤ'],
+      'ه': ['ه', 'ة']
     };
 
     const STORAGE_KEY = 'kalima_game_state';
@@ -269,7 +270,9 @@
     let todayKey = '';
     let longPressTimer = null;
     let activePopup = null;
-    let longPressTriggered = false;
+    let activeVariantButton = null;
+    let activeTouchVariantKey = null;
+    let suppressNextKeyClick = false;
 
     const gameArea = document.getElementById('game-area');
     const messageEl = document.getElementById('message');
@@ -288,6 +291,8 @@
         activePopup.remove();
         activePopup = null;
       }
+      activeVariantButton = null;
+      activeTouchVariantKey = null;
     }
 
     function insertLetter(letter) {
@@ -312,24 +317,40 @@
         btn.className = 'variant-option';
         btn.textContent = letter;
         btn.type = 'button';
-
-        const chooseVariant = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          insertLetter(letter);
-          closeVariantPopup();
-          longPressTriggered = true;
-        };
-
-        btn.addEventListener('touchstart', chooseVariant, { passive: false });
-        btn.addEventListener('click', chooseVariant);
-        btn.addEventListener('contextmenu', (e) => e.preventDefault());
-
+        btn.dataset.letter = letter;
         popup.appendChild(btn);
       });
 
       keyEl.appendChild(popup);
       activePopup = popup;
+    }
+
+    function setActiveVariantButton(btn) {
+      if (activeVariantButton) {
+        activeVariantButton.classList.remove('active');
+      }
+      activeVariantButton = btn || null;
+      if (activeVariantButton) {
+        activeVariantButton.classList.add('active');
+      }
+    }
+
+    function updateActiveVariantFromPoint(x, y) {
+      if (!activePopup) return;
+      const el = document.elementFromPoint(x, y);
+      const btn = el ? el.closest('.variant-option') : null;
+      if (btn && activePopup.contains(btn)) {
+        setActiveVariantButton(btn);
+      } else {
+        setActiveVariantButton(null);
+      }
+    }
+
+    function commitActiveVariant() {
+      if (activeVariantButton) {
+        insertLetter(activeVariantButton.dataset.letter);
+      }
+      closeVariantPopup();
     }
 
     async function loadWords() {
@@ -478,45 +499,77 @@
           if (keyboardStatus[key]) keyEl.className += ' ' + keyboardStatus[key];
           keyEl.textContent = key;
           keyEl.dataset.key = key;
+          keyEl.type = 'button';
 
           const hasVariants = !!LETTER_VARIANTS[key];
 
           keyEl.addEventListener('touchstart', (e) => {
             if (gameState !== 'playing') return;
-            longPressTriggered = false;
+            suppressNextKeyClick = false;
+            clearTimeout(longPressTimer);
 
             if (!hasVariants) return;
 
             e.preventDefault();
+            activeTouchVariantKey = key;
 
+            const touch = e.touches[0];
             longPressTimer = setTimeout(() => {
-              longPressTriggered = true;
               showVariantPopup(keyEl, key);
-            }, 400);
+              updateActiveVariantFromPoint(touch.clientX, touch.clientY);
+            }, 350);
           }, { passive: false });
 
-          keyEl.addEventListener('touchend', () => {
+          keyEl.addEventListener('touchmove', (e) => {
+            if (!hasVariants) return;
+            if (!activeTouchVariantKey || activeTouchVariantKey !== key) return;
+            if (!activePopup) return;
+
+            e.preventDefault();
+            const touch = e.touches[0];
+            updateActiveVariantFromPoint(touch.clientX, touch.clientY);
+          }, { passive: false });
+
+          keyEl.addEventListener('touchend', (e) => {
+            if (!hasVariants) return;
             clearTimeout(longPressTimer);
-          });
+
+            if (activePopup && activeTouchVariantKey === key) {
+              e.preventDefault();
+              suppressNextKeyClick = true;
+              commitActiveVariant();
+            }
+            activeTouchVariantKey = null;
+          }, { passive: false });
 
           keyEl.addEventListener('touchcancel', () => {
             clearTimeout(longPressTimer);
+            activeTouchVariantKey = null;
+            closeVariantPopup();
           });
 
           keyEl.addEventListener('mousedown', () => {
             if (gameState !== 'playing') return;
-            longPressTriggered = false;
-
+            clearTimeout(longPressTimer);
             if (!hasVariants) return;
 
             longPressTimer = setTimeout(() => {
-              longPressTriggered = true;
               showVariantPopup(keyEl, key);
-            }, 400);
+            }, 350);
+          });
+
+          keyEl.addEventListener('mousemove', (e) => {
+            if (activePopup && hasVariants) {
+              updateActiveVariantFromPoint(e.clientX, e.clientY);
+            }
           });
 
           keyEl.addEventListener('mouseup', () => {
             clearTimeout(longPressTimer);
+            if (activePopup && hasVariants) {
+              suppressNextKeyClick = true;
+              commitActiveVariant();
+            }
           });
 
           keyEl.addEventListener('mouseleave', () => {
@@ -527,10 +580,8 @@
             e.preventDefault();
             e.stopPropagation();
 
-            if (longPressTriggered) {
-              setTimeout(() => {
-                longPressTriggered = false;
-              }, 300);
+            if (suppressNextKeyClick) {
+              suppressNextKeyClick = false;
               return;
             }
 
@@ -555,6 +606,23 @@
         if (gameState !== 'playing') keyEl.disabled = true;
       });
     }
+
+    document.addEventListener('touchmove', (e) => {
+      if (!activePopup) return;
+      const touch = e.touches[0];
+      if (!touch) return;
+      e.preventDefault();
+      updateActiveVariantFromPoint(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+      if (activePopup) {
+        e.preventDefault();
+        suppressNextKeyClick = true;
+        commitActiveVariant();
+        return;
+      }
+    }, { passive: false });
 
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.key') && !e.target.closest('.variant-popup')) {
@@ -689,7 +757,7 @@
     let lastTouchEnd = 0;
 
     document.addEventListener('touchend', function (e) {
-      if (e.target.closest('.variant-popup') || e.target.closest('.variant-option')) return;
+      if (activePopup || e.target.closest('.variant-popup') || e.target.closest('.variant-option')) return;
       const now = Date.now();
       if (now - lastTouchEnd < 350) {
         e.preventDefault();
@@ -711,4 +779,3 @@
   </script>
 </body>
 </html>
-
