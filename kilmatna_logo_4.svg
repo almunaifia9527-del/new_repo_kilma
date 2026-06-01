@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 612 792">
+  <!-- Generator: Adobe Illustrator 29.3.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 151)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #101829;
+      }
+
+      .st1 {
+        fill: url(#linear-gradient2);
+      }
+
+      .st2 {
+        fill: url(#linear-gradient1);
+      }
+
+      .st3 {
+        fill: url(#linear-gradient3);
+      }
+
+      .st4 {
+        fill: url(#linear-gradient5);
+      }
+
+      .st5 {
+        fill: url(#linear-gradient4);
+      }
+
+      .st6 {
+        filter: url(#outer-glow-2);
+      }
+
+      .st7 {
+        fill: url(#linear-gradient);
+      }
+
+      .st8 {
+        filter: url(#outer-glow-4);
+      }
+
+      .st8, .st9 {
+        fill: #44b75e;
+      }
+
+      .st8, .st9, .st10 {
+        stroke-width: .2px;
+      }
+
+      .st8, .st9, .st10, .st11 {
+        stroke: #14192b;
+        stroke-miterlimit: 10;
+      }
+
+      .st9 {
+        filter: url(#outer-glow-3);
+      }
+
+      .st10 {
+        fill: #f49e1e;
+        filter: url(#outer-glow-5);
+      }
+
+      .st11 {
+        fill: #19192e;
+        filter: url(#outer-glow-1);
+      }
+    </style>
+    <filter id="outer-glow-1" x="121.2" y="276.5" width="345.6" height="193" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur" stdDeviation="5.7"/>
+      <feFlood flood-color="#231f20" flood-opacity=".6"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="outer-glow-2" x="139" y="304" width="313" height="122" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur1" stdDeviation="5.7"/>
+      <feFlood flood-color="#231f20" flood-opacity=".6"/>
+      <feComposite in2="blur1" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <linearGradient id="linear-gradient" x1="194.2" y1="399.3" x2="140.8" y2="345.8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fcd34d"/>
+      <stop offset="0" stop-color="#fbcd46"/>
+      <stop offset="0" stop-color="#f8bc30"/>
+      <stop offset="0" stop-color="#f7ae1f"/>
+      <stop offset="0" stop-color="#f5a413"/>
+      <stop offset="0" stop-color="#f59f0c"/>
+      <stop offset="0" stop-color="#f59e0b"/>
+      <stop offset="0" stop-color="#f5a210"/>
+      <stop offset=".1" stop-color="#f7b427"/>
+      <stop offset=".2" stop-color="#f9c238"/>
+      <stop offset=".3" stop-color="#fbcb44"/>
+      <stop offset=".5" stop-color="#fbd14b"/>
+      <stop offset="1" stop-color="#fcd34d"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient1" x1="224.6" y1="409.6" x2="184.5" y2="369.5" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient2" x1="268.6" y1="411.4" x2="227.5" y2="370.3" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient3" x1="328.8" y1="418.5" x2="279" y2="368.7" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient4" x1="385.3" y1="402.7" x2="331.6" y2="349" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient5" x1="439.1" y1="403.4" x2="385.4" y2="349.6" xlink:href="#linear-gradient"/>
+    <filter id="outer-glow-3" x="231.2" y="312.8" width="48" height="48" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur2" stdDeviation="5.7"/>
+      <feFlood flood-color="#231f20" flood-opacity=".6"/>
+      <feComposite in2="blur2" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="outer-glow-4" x="214.8" y="312.8" width="48.2" height="48" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur3" stdDeviation="5.7"/>
+      <feFlood flood-color="#231f20" flood-opacity=".6"/>
+      <feComposite in2="blur3" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="outer-glow-5" x="179.8" y="312.8" width="48" height="48" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur4" stdDeviation="5.7"/>
+      <feFlood flood-color="#231f20" flood-opacity=".6"/>
+      <feComposite in2="blur4" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <rect class="st0" x="-114.7" y="98.4" width="842" height="595.3"/>
+  <rect class="st11" x="138.9" y="294.2" width="310.2" height="157.6"/>
+  <g class="st6">
+    <path class="st7" d="M184.8,396.1c.3,0,.5.1.5.4v11.5c0,.3-.2.5-.5.5h-28.3v-78.4h15.4v66h12.9Z"/>
+    <path class="st2" d="M183.8,396.1h12.9v-38.7h15.4v38.7h13.4c.3,0,.5.1.5.4v11.5c0,.3-.2.5-.5.5h-41.7"/>
+    <path class="st1" d="M224.4,396.1h16v-38.7h15.4v38.7h15.5c.3,0,.5.1.5.4v11.5c0,.3-.2.5-.5.5h-46.9"/>
+    <path class="st3" d="M270.3,396.1h11.7c-.9-2.1-1.6-4.4-2.1-6.8-.5-2.4-.7-4.9-.7-7.5s.5-6.2,1.5-9.6,2.3-6.5,3.8-8.9c3.3-1.9,6.8-3.4,10.6-4.4,3.7-1,7-1.5,9.9-1.5s4.6.3,6.7.8c2.1.5,4.2,1.3,6.1,2.2,3.9,2,6.8,4.8,9,8.5,2.1,3.7,3.2,8,3.2,12.8s-.2,3.8-.5,5.5c-.3,1.8-.8,3.5-1.5,5.1,1.2,1.4,2.7,2.3,4.3,2.9,1.6.6,3.6.8,6,.8h.5c.3,0,.5.1.5.4v11.5c0,.3-.2.5-.5.5h-.5c-3.6,0-6.8-.5-9.5-1.5-2.7-1-5.2-2.8-7.5-5.4-2.6,2.3-5.6,4-9,5.2-3.4,1.2-6.9,1.8-10.5,1.8h-31.4M293.4,384c0,1.7.2,3.6.6,5.6.4,2,1,4.2,1.8,6.4h3.9c2.8,0,5.2-.6,7.4-1.9,2.2-1.3,4-3,5.3-5.2,1.3-2.2,2-4.6,2-7.2s-.9-6.6-2.7-8.7c-1.8-2.2-4.2-3.3-7.1-3.3s-3.1.2-4.7.7c-1.6.5-3.3,1.2-4.9,2.2-.5,1.8-.9,3.6-1.1,5.5-.3,1.9-.4,3.8-.4,5.8Z"/>
+    <path class="st5" d="M337.6,396.1h12.9v-66h15.4v66h13.4c.3,0,.5.1.5.4v11.5c0,.3-.2.5-.5.5h-41.7"/>
+    <path class="st4" d="M378.3,396.1h40.4v-16.6c0-4.1-1.4-7.3-4.3-9.5-2.9-2.2-6.9-3.4-12.1-3.4h-17.5v-11.1c1.2-2.4,2.4-4.7,3.8-6.9,1.4-2.2,2.9-4.3,4.6-6.3,3.9-4.5,8.3-8.6,13.4-12.1,5.1-3.5,10.6-6.4,16.7-8.6l5.7,13.8c-3,.9-5.9,2-8.7,3.4-2.9,1.4-5.5,2.9-8,4.6-2.5,1.7-4.7,3.4-6.7,5.3-1.9,1.8-3.5,3.7-4.7,5.5h3.9c9.8,0,17.2,1.9,22.1,5.8,4.9,3.9,7.3,9.7,7.3,17.5v31h-55.7"/>
+  </g>
+  <rect class="st9" x="248.4" y="330" width="13.5" height="13.5" rx="1.6" ry="1.6"/>
+  <rect class="st8" x="232.1" y="330" width="13.5" height="13.5" rx="1.6" ry="1.6"/>
+  <rect class="st10" x="197" y="330" width="13.5" height="13.5" rx="1.6" ry="1.6"/>
+</svg>
